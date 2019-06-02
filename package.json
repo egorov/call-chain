@@ -1,0 +1,20 @@
+{
+  "name": "call-chain",
+  "version": "0.0.1",
+  "description": "Function call chain builder",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint src tests",
+    "pretest": "npm run lint",
+    "test": "node node_modules/jasmine/bin/jasmine --config=jasmine.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egorov/call-chain.git"
+  },
+  "author": "Sergey Egorov",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "jasmine": "^3.4.0"
+  }
+}
