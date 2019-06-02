@@ -2,26 +2,24 @@ describe('makeChain', () => {
 
   const makeChain = require('../src/makeChain');
   let array = null;
-  const methods = [
-    (container, callback) => {
-      container.push('first');
-      return callback(container);
-    },
-    (container, callback) => {
-      container.push('second');
-      return callback(container);
-    },
-    (container, callback) => {
-      container.push('third');
-      return callback(container);
-    },
-    () => {
-      array.push('last');
-    }
-  ];
+  let methods = null;
 
   beforeEach(() => {
     array = [];
+    methods = [
+      (container, callback) => {
+        container.push('first');
+        return callback(container);
+      },
+      (container, callback) => {
+        container.push('second');
+        return callback(container);
+      },
+      (container, callback) => {
+        container.push('third');
+        return callback(container);
+      }
+    ];
   });
 
   it('should call a sequence of functions', () => {
@@ -30,11 +28,25 @@ describe('makeChain', () => {
 
     chain();
 
-    expect(array.length).toEqual(4);
+    expect(array.length).toEqual(3);
     expect(array[0]).toEqual('first');
     expect(array[1]).toEqual('second');
     expect(array[2]).toEqual('third');
-    expect(array[3]).toEqual('last');
+  });
+
+  it('should interrupt chain execution', () => {
+
+    const noCallback = (container) => container.push('interrupted');
+
+    methods.splice(1, 0, noCallback);
+
+    const chain = makeChain(methods, array);
+
+    chain();
+
+    expect(array.length).toEqual(2);
+    expect(array[0]).toEqual('first');
+    expect(array[1]).toEqual('interrupted');
   });
 
   it('should throw an error', () => {
