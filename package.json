@@ -1,7 +1,7 @@
 {
-  "name": "call-chain",
+  "name": "functions-call-chain",
   "version": "0.0.1",
-  "description": "Function call chain builder",
+  "description": "Functions call chain factory",
   "scripts": {
     "lint": "./node_modules/.bin/eslint src tests",
     "pretest": "npm run lint",

@@ -1,4 +1,4 @@
-# Functions call chain builder
+# Functions call chain factory
 
 How to use it?
 
