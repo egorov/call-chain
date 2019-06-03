@@ -1,15 +1,13 @@
-function makeChain(methods, ...args) {
+function makeChain(methods, initial) {
 
   validateMethods(methods);
 
-  const array = args[0];
-
   let caller = null;
-  let last = methods[methods.length - 1].bind(null, array, () => 0);
+  let last = methods[methods.length - 1].bind(null, initial, () => 0);
 
   for(let index = methods.length - 2; index >= 0; index -= 1){
 
-    caller = methods[index].bind(null, array, last);
+    caller = methods[index].bind(null, initial, last);
 
     last = caller;
   }
