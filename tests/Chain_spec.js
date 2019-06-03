@@ -15,7 +15,9 @@ describe('chain', () => {
 
         result.push(value);
 
-        return callback(null, value);
+        process.nextTick(() => {
+          return callback(null, value);
+        });
       },
       (error, data, callback) => {
         if (error)
@@ -25,7 +27,9 @@ describe('chain', () => {
 
         result.push(value);
 
-        return callback(null, value);
+        process.nextTick(() => {
+          return callback(null, value);
+        });
       },
       (error, data, callback) => {
         if (error)
@@ -35,20 +39,27 @@ describe('chain', () => {
 
         result.push(value);
 
-        return callback(null, value);
+        process.nextTick(() => {
+          return callback(null, value);
+        });
       }
     ];
   });
 
-  it('should pass', () => {
+  it('should call chain of functions', (done) => {
+
+    function checkResult() {      
+      expect(result.length).toEqual(3);
+      expect(result[0]).toEqual('Count... first');
+      expect(result[1]).toEqual('Count... first second');
+      expect(result[2]).toEqual('Count... first second third');  
+      done();
+    }
+
+    methods.push(checkResult);
 
     const chain = new Chain(methods, 'Count...');
 
     chain.start();
-
-    expect(result.length).toEqual(3);
-    expect(result[0]).toEqual('Count... first');
-    expect(result[1]).toEqual('Count... first second');
-    expect(result[2]).toEqual('Count... first second third');
   });
 });
