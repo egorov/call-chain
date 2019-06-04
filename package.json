@@ -4,6 +4,7 @@
   "description": "Functions call chain factory",
   "scripts": {
     "lint": "./node_modules/.bin/eslint src tests",
+    "pretest": "npm run lint",
     "test": "node node_modules/jasmine/bin/jasmine --config=jasmine.json"
   },
   "repository": {

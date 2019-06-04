@@ -1,3 +1,5 @@
+/* eslint no-invalid-this: "off" */
+
 const EventEmitter = require('events');
 
 const chainPrototype = {
@@ -6,9 +8,10 @@ const chainPrototype = {
   errors: [],
   data: [],
   start() {
-    const method = this.methods[0];
-    const error = this.errors[0];
-    const data = this.data[0];
+    this.index = 0;
+    const method = this.methods[this.index];
+    const error = this.errors[this.index];
+    const data = this.data[this.index];
     const callback = this.cb.bind(this);
     
     method(error, data, callback);    
@@ -22,17 +25,38 @@ const chainPrototype = {
 };
 
 function Chain(methods, initial) {
+
+  validateMethods(methods);
+
   const chain = Object.assign(new EventEmitter(), chainPrototype);
 
   chain.methods = methods;
   chain.errors.push(null);
   chain.data.push(initial);
-  chain.on('next', NextCallback.bind(chain));
+  chain.on('next', nextCallback.bind(chain));
 
   return chain;
 }
 
-function NextCallback(index){
+function validateMethods(value){
+  'use strict';
+
+  const error =
+    new TypeError('"methods" argument must not empty be array of functions!');
+
+  if(!Array.isArray(value))
+    throw error;
+
+  if(value.length === 0)
+    throw error;
+
+  for(let index = 0; index < value.length; index += 1){
+    if(typeof value[index] !== 'function')
+      throw error;
+  }
+}
+
+function nextCallback(index){
 
   if(index >= this.methods.length)
     return;

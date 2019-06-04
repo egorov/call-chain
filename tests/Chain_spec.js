@@ -1,6 +1,8 @@
 describe('chain', () => {
 
   const Chain = require('../src/Chain');
+  const methodsValidationError =
+    new TypeError('"methods" argument must not empty be array of functions!');
   let result = null;
   let methods = null;
 
@@ -15,9 +17,7 @@ describe('chain', () => {
 
         result.push(value);
 
-        process.nextTick(() => {
-          return callback(null, value);
-        });
+        return process.nextTick(() => callback(null, value));
       },
       (error, data, callback) => {
         if (error)
@@ -27,9 +27,7 @@ describe('chain', () => {
 
         result.push(value);
 
-        process.nextTick(() => {
-          return callback(null, value);
-        });
+        return process.nextTick(() => callback(null, value));
       },
       (error, data, callback) => {
         if (error)
@@ -39,9 +37,7 @@ describe('chain', () => {
 
         result.push(value);
 
-        process.nextTick(() => {
-          return callback(null, value);
-        });
+        return process.nextTick(() => callback(null, value));
       }
     ];
   });
@@ -61,5 +57,24 @@ describe('chain', () => {
     const chain = new Chain(methods, 'Count...');
 
     chain.start();
+  });
+
+  it('should throw if methods is not array', () => {
+
+    expect(() => new Chain(null, "Count")).toThrow(methodsValidationError);
+  });
+
+  it('should throw if methods array is empty', () => {
+
+    expect(() => new Chain([], "Count")).toThrow(methodsValidationError);
+  });
+
+  it('should throw if methods array contains non function', () => {
+    const wrong = [
+      () => console.log('hello'),
+      1
+    ];
+
+    expect(() => new Chain(wrong, "Count")).toThrow(methodsValidationError);
   });
 });
