@@ -1,4 +1,4 @@
-describe('chain', () => {
+describe('Chain', () => {
 
   const Chain = require('../src/Chain');
   const methodsValidationError =
@@ -42,7 +42,7 @@ describe('chain', () => {
     ];
   });
 
-  it('should call chain of functions', (done) => {
+  it('should execute functions in array', (done) => {
 
     function checkResult() {      
       expect(result.length).toEqual(3);
@@ -54,6 +54,21 @@ describe('chain', () => {
 
     methods.push(checkResult);
 
+    const chain = new Chain(methods, 'Count...');
+
+    chain.start();
+  });
+
+  it('should interrupt executions on sync function', (done) => {
+
+    setTimeout(() => {
+      expect(result.length).toEqual(2);
+      expect(result[0]).toEqual('Count... first');
+      expect(result[1]).toEqual('interrupted!');
+      done();
+    }, 100);
+
+    methods.splice(1, 0, () => result.push('interrupted!'));
     const chain = new Chain(methods, 'Count...');
 
     chain.start();

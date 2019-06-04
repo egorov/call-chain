@@ -54,10 +54,23 @@ function startPrototype() {
 }
 
 function callbackPrototype(error, data) {
+  validateError(error);
+  validateData(data);
+  
   this.index += 1;
   this.errors.push(error);
   this.data.push(data);
   this.emit('next', this.index);
+}
+
+function validateError(value) {
+  if(typeof value === 'undefined')
+    throw new Error('error value is required!');
+}
+
+function validateData(value) {
+  if(typeof value === 'undefined')
+    throw new Error('data value is required!');
 }
 
 function nextCallback(index){
