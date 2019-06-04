@@ -2,37 +2,24 @@
 
 const EventEmitter = require('events');
 
-const chainPrototype = {
-  index: 0,
-  methods: null,
-  errors: [],
-  data: [],
-  start() {
-    this.index = 0;
-    const method = this.methods[this.index];
-    const error = this.errors[this.index];
-    const data = this.data[this.index];
-    const callback = this.cb.bind(this);
-    
-    method(error, data, callback);    
-  },
-  cb(error, data) {
-    this.index += 1;
-    this.errors.push(error);
-    this.data.push(data);
-    this.emit('next', this.index);
-  }
-};
+function ChainPrototype() {
+  this.index = 0;
+  this.methods = [];
+  this.errors = [];
+  this.data = [];
+}
 
 function Chain(methods, initial) {
 
   validateMethods(methods);
 
-  const chain = Object.assign(new EventEmitter(), chainPrototype);
+  const chain = Object.assign(new EventEmitter(), new ChainPrototype());
 
   chain.methods = methods;
   chain.errors.push(null);
   chain.data.push(initial);
+  chain.start = startPrototype.bind(chain);
+  chain.cb = callbackPrototype.bind(chain);
   chain.on('next', nextCallback.bind(chain));
 
   return chain;
@@ -54,6 +41,23 @@ function validateMethods(value){
     if(typeof value[index] !== 'function')
       throw error;
   }
+}
+
+function startPrototype() {
+  this.index = 0;
+  const method = this.methods[this.index];
+  const error = this.errors[this.index];
+  const data = this.data[this.index];
+  const callback = this.cb.bind(this);
+  
+  method(error, data, callback);    
+}
+
+function callbackPrototype(error, data) {
+  this.index += 1;
+  this.errors.push(error);
+  this.data.push(data);
+  this.emit('next', this.index);
 }
 
 function nextCallback(index){
