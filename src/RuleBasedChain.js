@@ -2,18 +2,19 @@
 
 const EventEmitter = require('events');
 
-function ChainPrototype() {
+function RuleBasedChainPrototype() {
   this.index = 0;
   this.rules = [];
   this.errors = [];
   this.data = null;
 }
 
-function Chain(rules, initial) {
+function RuleBasedChain(rules, initial) {
 
   validateRules(rules);
 
-  const chain = Object.assign(new EventEmitter(), new ChainPrototype());
+  const chain = 
+    Object.assign(new EventEmitter(), new RuleBasedChainPrototype());
 
   chain.rules = rules;
   chain.errors.push(null);
@@ -45,11 +46,11 @@ function validateRules(value){
 
 function startPrototype() {
   this.index = 0;
-  const rule = this.rules[0];
-  const method = this.data[rule.type];
+  this.data.rule = this.rules[0];
+  const method = this.data[this.data.rule.type];
   const callback = this.cb.bind(this);
   
-  method(rule, null, this.data, callback);    
+  method(null, this.data, callback);    
 }
 
 function callbackPrototype(error, data) {
@@ -76,10 +77,10 @@ function nextCallback(index){
   if(index >= this.rules.length)
     return;
 
-  const rule = this.rules[index];
-  const method = this.data[rule.type];
+  this.data.rule = this.rules[index];
+  const method = this.data[this.data.rule.type];
 
-  method(rule, this.errors[index], this.data, this.cb.bind(this));
+  method(this.errors[index], this.data, this.cb.bind(this));
 }
 
-module.exports = Chain;
+module.exports = RuleBasedChain;

@@ -1,25 +1,23 @@
-/* eslint max-params: "off" */
-
 describe('Rule based chain', () => {
 
   const ctx = {
-    alert (rule, error, context, callback) {
+    alert (error, context, callback) {
 
       if(error)
         return callback(error, context);
 
-      const message = rule.getAlert(context);
+      const message = context.rule.getAlert(context);
 
       context.messages.push(message);
 
       return callback(null, context);
     },
-    warning (rule, error, context, callback) {
+    warning (error, context, callback) {
       
       if(error)
         return callback(error, context);
 
-      const message = rule.getWarning(context);
+      const message = context.rule.getWarning(context);
 
       context.messages.push(message);
 
@@ -51,15 +49,15 @@ describe('Rule based chain', () => {
 
     ctx.end = done;
 
-    ctx.check = (rule, error, context, callback) => {
+    ctx.check = (error, context, callback) => {
       
-      expect(rule).toEqual({type: 'check'});
+      expect(context.rule).toEqual({type: 'check'});
       expect(error).toBeNull();
 
-      expect(ctx.messages[0]).toEqual('Alert 0!');
-      expect(ctx.messages[1]).toEqual('Warning 1!');
-      expect(ctx.messages[2]).toEqual('Alert 2!');
-      expect(ctx.messages[3]).toEqual('Warning 3!');
+      expect(context.messages[0]).toEqual('Alert 0!');
+      expect(context.messages[1]).toEqual('Warning 1!');
+      expect(context.messages[2]).toEqual('Alert 2!');
+      expect(context.messages[3]).toEqual('Warning 3!');
 
       return callback(null, context);
     };
