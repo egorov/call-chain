@@ -1,49 +1,23 @@
 describe('Rule based chain', () => {
 
+  const Chain = require('../src/RuleBasedChain');
   const ctx = {
-    alert (error, context, callback) {
-
-      if(error)
-        return callback(error, context);
-
-      const message = context.rule.getAlert(context);
-
-      context.messages.push(message);
-
-      return callback(null, context);
-    },
-    warning (error, context, callback) {
-      
-      if(error)
-        return callback(error, context);
-
-      const message = context.rule.getWarning(context);
-
-      context.messages.push(message);
-
-      return callback(null, context);
-    },
+    alert: require('./alert'),
+    warning: require('./warning'),
     messages: []
   };
-  const Chain = require('../src/RuleBasedChain');
-  const alert = { 
-    type: 'alert',
-    getAlert(context) {
-      return `Alert ${context.messages.length}!`;
-    }
-  };
-  const warning = {
-    type: 'warning',
-    getWarning(context) {      
-      return `Warning ${context.messages.length}!`;
-    }
-  };
-  const rules = [
-    alert,
-    warning,
-    alert,
-    warning
-  ];
+  const alert = require('./alertRule');
+  const warning = require('./warningRule');
+  let rules = null;
+
+  beforeEach(() => {
+    rules = [
+      alert,
+      warning,
+      alert,
+      warning
+    ];  
+  });
 
   it('should deal with rules methods', (done) => {
 
