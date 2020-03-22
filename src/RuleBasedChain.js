@@ -1,5 +1,3 @@
-/* eslint no-invalid-this: "off" */
-
 const EventEmitter = require('events');
 
 function RuleBasedChainPrototype() {
