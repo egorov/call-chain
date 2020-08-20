@@ -92,4 +92,78 @@ describe('Chain', () => {
 
     expect(() => new Chain(wrong, "Count")).toThrow(methodsValidationError);
   });
+
+  describe('multiple use', () => {
+
+    let chain = null;
+    const values = [];
+    const functions = [
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} first`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} second`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} third`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      }
+    ];
+
+    beforeEach((done) => {
+    
+      function checkResult() {      
+        expect(values.length).toEqual(3);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        done();
+      }
+  
+      functions.push(checkResult);
+  
+      chain = new Chain(functions, 'Count...');
+  
+      chain.start();
+    });
+
+    it('should execute chain again', (done) => {
+      
+      function checkAgain() {
+
+        expect(values.length).toEqual(6);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        expect(values[3]).toEqual('Count... first');
+        expect(values[4]).toEqual('Count... first second');
+        expect(values[5]).toEqual('Count... first second third');  
+        done();
+      }
+
+      functions.pop();
+      functions.push(checkAgain);
+      chain.start();
+    });
+  });
 });
