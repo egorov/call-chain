@@ -2,9 +2,6 @@ const EventEmitter = require('events');
 
 function ChainPrototype() {
   this.index = 0;
-  this.methods = [];
-  this.errors = [];
-  this.data = [];
 }
 
 function Chain(methods, initial) {
@@ -14,8 +11,9 @@ function Chain(methods, initial) {
   const chain = Object.assign(new EventEmitter(), new ChainPrototype());
 
   chain.methods = methods;
-  chain.errors.push(null);
-  chain.data.push(initial);
+  chain.errors = new Array(methods.length).fill(null);
+  chain.data = new Array(methods.length).fill(null);
+  chain.data[0] = initial;
   chain.start = startPrototype.bind(chain);
   chain.cb = callbackPrototype.bind(chain);
   chain.on('next', nextCallback.bind(chain));
@@ -57,8 +55,8 @@ function callbackPrototype(error, data) {
   validateData(data);
   
   this.index += 1;
-  this.errors.push(error);
-  this.data.push(data);
+  this.errors[this.index] = error;
+  this.data[this.index] = data;
   this.emit('next', this.index);
 }
 

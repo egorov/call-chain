@@ -44,7 +44,10 @@ describe('Chain', () => {
 
   it('should execute functions in array', (done) => {
 
-    function checkResult() {      
+    const chain = new Chain(methods, 'Count...');
+
+    function checkResult() {            
+
       expect(result.length).toEqual(3);
       expect(result[0]).toEqual('Count... first');
       expect(result[1]).toEqual('Count... first second');
@@ -53,8 +56,6 @@ describe('Chain', () => {
     }
 
     methods.push(checkResult);
-
-    const chain = new Chain(methods, 'Count...');
 
     chain.start();
   });
@@ -158,6 +159,7 @@ describe('Chain', () => {
         expect(values[3]).toEqual('Count... first');
         expect(values[4]).toEqual('Count... first second');
         expect(values[5]).toEqual('Count... first second third');  
+
         done();
       }
 

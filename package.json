@@ -1,6 +1,6 @@
 {
   "name": "functions-call-chain",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Functions call chain factory",
   "scripts": {
     "test": "node node_modules/jasmine/bin/jasmine --config=jasmine.json"
