@@ -43,6 +43,7 @@ function validateMethods(value){
 
 function startPrototype() {
   this.index = 0;
+  this.errors.fill(null);
   const method = this.methods[this.index];
   const error = this.errors[this.index];
   const data = this.data[this.index];

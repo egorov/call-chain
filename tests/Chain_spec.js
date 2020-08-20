@@ -166,4 +166,101 @@ describe('Chain', () => {
       chain.start();
     });
   });
+
+  describe('error handling', () => {
+
+    let chain = null;
+    const values = [];
+    const functions = [
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} first`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} second`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} third`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      }
+    ];
+
+    beforeEach((done) => {
+
+      function injectError(error, data, callback) {        
+        
+        expect(error).toBeNull();
+
+        return callback(new Error('Uups!'), data);
+      }
+    
+      function checkResult(error, data) {      
+
+        expect(error).toEqual(new Error('Uups!'));
+        expect(data).toEqual('Count... first second third');
+
+        expect(values.length).toEqual(3);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        done();
+      }
+  
+      functions.push(injectError);
+      functions.push(checkResult);
+  
+      chain = new Chain(functions, 'Count...');
+  
+      chain.start();
+    });
+
+    it('should reset previous run errors', (done) => {
+
+      function stub(error, data, callback) {
+        if(error) return callback(error, data);
+
+        return callback(null, data);
+      }
+      
+      function checkAgain(error, data) {
+
+        expect(error).toBeNull();
+        expect(data).toEqual('Count... first second third');
+
+        expect(values.length).toEqual(6);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        expect(values[3]).toEqual('Count... first');
+        expect(values[4]).toEqual('Count... first second');
+        expect(values[5]).toEqual('Count... first second third');  
+        done();
+      }
+
+      functions.pop();
+      functions.pop();
+      functions.push(stub);
+      functions.push(checkAgain);
+      chain.start();
+    });
+  });  
 });
