@@ -2,7 +2,7 @@ describe('Chain', () => {
 
   const Chain = require('../src/Chain');
   const methodsValidationError =
-    new TypeError('"methods" argument must not empty be array of functions!');
+    new TypeError('"methods" argument must be not empty array of functions!');
   let result = null;
   let methods = null;
 
@@ -264,5 +264,179 @@ describe('Chain', () => {
       functions.push(checkAgain);
       chain.start();
     });
+  });  
+
+  describe('number of methods increased', () => {
+    let chain = null;
+    const values = [];
+    const functions = [
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} first`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} second`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} third`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      }
+    ];
+
+    function stub(error, data, callback) {
+      if(error) return callback(error, data);
+
+      return callback(null, data);
+    }
+
+    beforeEach((done) => {
+
+      chain = new Chain(functions, 'Count...');
+
+      function checkResult(error, data) {      
+
+        expect(error).toBeNull();
+        expect(data).toEqual('Count... first second third');
+
+        expect(values.length).toEqual(3);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        done();
+      }
+  
+      functions.push(checkResult);
+      chain.start();
+    });
+
+    it('should pass after methods added', (done) => {
+     
+      function checkAgain(error, data) {
+
+        expect(error).toBeNull();
+        expect(data).toEqual('Count... first second third');
+
+        expect(values.length).toEqual(6);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        expect(values[3]).toEqual('Count... first');
+        expect(values[4]).toEqual('Count... first second');
+        expect(values[5]).toEqual('Count... first second third');  
+        done();
+      }
+
+      functions.pop();
+      functions.push(stub);
+      functions.push(stub);
+      functions.push(checkAgain);
+      chain.start();
+    });    
+  });
+
+  describe('number of methods decreased', () => {
+    let chain = null;
+    const values = [];
+    const functions = [
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} first`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} second`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      },
+      (error, data, callback) => {
+        if (error)
+          return callback(error);
+
+        const value = `${data} third`;
+
+        values.push(value);
+
+        return process.nextTick(() => callback(null, value));
+      }
+    ];
+
+    function stub(error, data, callback) {
+      if(error) return callback(error, data);
+
+      return callback(null, data);
+    }
+
+    beforeEach((done) => {
+
+      chain = new Chain(functions, 'Count...');
+
+      function checkResult(error, data) {      
+
+        expect(error).toBeNull();
+        expect(data).toEqual('Count... first second third');
+
+        expect(values.length).toEqual(3);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        done();
+      }
+  
+      functions.push(stub);
+      functions.push(checkResult);
+      chain.start();
+    });
+
+    it('should pass after methods removed', (done) => {
+     
+      function checkAgain(error, data) {
+
+        expect(error).toBeNull();
+        expect(data).toEqual('Count... first second');
+
+        expect(values.length).toEqual(5);
+        expect(values[0]).toEqual('Count... first');
+        expect(values[1]).toEqual('Count... first second');
+        expect(values[2]).toEqual('Count... first second third');  
+        expect(values[3]).toEqual('Count... first');
+        expect(values[4]).toEqual('Count... first second');
+        done();
+      }
+
+      functions.pop();
+      functions.pop();
+      functions.pop();
+      functions.push(checkAgain);
+      chain.start();
+    });    
   });  
 });

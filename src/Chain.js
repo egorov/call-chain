@@ -11,8 +11,8 @@ function Chain(methods, initial) {
   const chain = Object.assign(new EventEmitter(), new ChainPrototype());
 
   chain.methods = methods;
-  chain.errors = new Array(methods.length).fill(null);
-  chain.data = new Array(methods.length).fill(null);
+  chain.errors = new Array(methods.length);
+  chain.data = new Array(methods.length);
   chain.data[0] = initial;
   chain.start = startPrototype.bind(chain);
   chain.cb = callbackPrototype.bind(chain);
@@ -25,7 +25,7 @@ function validateMethods(value){
   'use strict';
 
   const error =
-    new TypeError('"methods" argument must not empty be array of functions!');
+    new TypeError('"methods" argument must be not empty array of functions!');
 
   if(!Array.isArray(value))
     throw error;
@@ -41,7 +41,7 @@ function validateMethods(value){
 
 function startPrototype() {
   this.index = 0;
-  this.errors.fill(null);
+  this.errors.fill(void 0);
   const method = this.methods[this.index];
   const error = this.errors[this.index];
   const data = this.data[this.index];
